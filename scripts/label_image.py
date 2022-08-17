@@ -20,9 +20,13 @@ from __future__ import print_function
 import argparse
 import sys
 import time
+import json
 
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.compat.v1.disable_eager_execution()
+print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 def load_graph(model_file):
   graph = tf.Graph()
@@ -131,7 +135,14 @@ if __name__ == "__main__":
   top_k = results.argsort()[-5:][::-1]
   labels = load_labels(label_file)
 
-  print('\nEvaluation time (1-image): {:.3f}s\n'.format(end-start))
-  template = "{} (score={:0.5f})"
+  case_list = []
   for i in top_k:
-    print(template.format(labels[i], results[i]))
+   case = {'name':labels[i], 'score':float(results[i])}
+   case_list.append(case)
+   
+  print(json.dumps(case_list))
+
+  #print('\nEvaluation time (1-image): {:.3f}s\n'.format(end-start))
+  #template = "{} (score={:0.5f})"
+  #for i in top_k:
+  #  print(template.format(labels[i], results[i]))
